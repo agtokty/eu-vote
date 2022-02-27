@@ -18,7 +18,7 @@ function VerifyPage() {
         console.log(qrData);
         let userIdentifier = qrData?.nam?.fn;
         localStorage.setItem("user", userIdentifier);
-        alert("verified " + qrData.nam.fn)
+        alert("Certofocate owner: " + qrData.nam.fn)
         // navigate("/vote");
     }
 
