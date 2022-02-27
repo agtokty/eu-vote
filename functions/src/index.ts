@@ -28,7 +28,7 @@ const decodeData = (greenpassBody: string) => {
 
         return JSON.parse(greenpassDataJson);
     } catch (e) {
-        return {};
+        return null;
     }
 }
 
@@ -40,19 +40,24 @@ export const decodeGreenPassBody = functions.https.onRequest((request, response)
     response.set('Access-Control-Allow-Origin', '*');
 
     if (request.method === 'OPTIONS') {
-        response.set('Access-Control-Allow-Methods', 'POST');
+        response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
         response.set('Access-Control-Max-Age', '3600');
+        response.set('Access-Control-Allow-Headers', 'content-type');
         response.status(204).send('');
         return;
     }
 
     functions.logger.info("on decodeGreenPassBody");
 
-    if (request.body.greenpassBody) {
-        let resultData = decodeData(request.body.greenpassBody)
+    if (request.body.data && request.body.data.greenPassBody) {
+        let resultData = decodeData(request.body.data.greenPassBody);
 
-        response.json({ result: true, data: resultData });
+        if (resultData) {
+            response.json({ result: true, data: resultData });
+        } else {
+            response.status(500).json({ result: false });
+        }
     } else {
-        response.json({ result: false });
+        response.status(400).json({ result: false });
     }
 });

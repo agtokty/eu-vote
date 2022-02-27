@@ -1,30 +1,12 @@
 import React, { useState } from 'react';
-import '../style/Page.css';
-import { decode } from '../utils/base45';
+
 import CerificateUpload from './component/verify/CerificateUpload';
 import CerificateUploadResult from './component/verify/CerificateUploadResult';
-import { initializeApp } from 'firebase/app';
-import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/functions";
 
 import { useNavigate } from 'react-router-dom';
+import { DCCData } from '../service/models';
 
-const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: "eu-vote.firebaseapp.com",
-    projectId: "eu-vote",
-    storageBucket: "eu-vote.appspot.com",
-    messagingSenderId: "197197846473",
-    appId: "1:197197846473:web:c6801e6634388a5c24ba18",
-    measurementId: "G-532L0JGTX4"
-};
-
-const app = initializeApp(firebaseConfig);
-const functions = getFunctions(app);
-
-console.log(process.env.NODE_ENV)
-if (process.env.NODE_ENV === "development") {
-    connectFunctionsEmulator(functions, "localhost", 5001);
-}
+import '../style/Page.css';
 
 function VerifyPage() {
 
@@ -32,27 +14,12 @@ function VerifyPage() {
 
     let navigate = useNavigate();
 
-    function onData(greenpassBody: any) {
-        if (!greenpassBody) {
-            console.log("error - empty data!")
-        }
-
-
-        const decodeGreenPassBody = httpsCallable(functions, 'decodeGreenPassBody');
-
-        decodeGreenPassBody({ greenpassBody: greenpassBody })
-            .then((result) => {
-                console.log(result);
-                let userIdentifier = "user_identifier";
-                localStorage.setItem("user", userIdentifier);
-                navigate("/vote");
-            })
-            .catch((error) => {
-                const code = error.code;
-                const message = error.message;
-                const details = error.details;
-                console.log(error);
-            });
+    function onUserVerified(qrData: DCCData) {
+        console.log(qrData);
+        let userIdentifier = qrData?.nam?.fn;
+        localStorage.setItem("user", userIdentifier);
+        alert("verified " + qrData.nam.fn)
+        // navigate("/vote");
     }
 
     return (
@@ -65,7 +32,7 @@ function VerifyPage() {
                         </div>
                         {
                             data === "" ?
-                                <CerificateUpload onData={onData} />
+                                <CerificateUpload onUserVerified={onUserVerified} />
                                 :
                                 <CerificateUploadResult data={data} />
                         }
