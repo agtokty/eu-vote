@@ -79,7 +79,9 @@ function CerificateUpload(props: CerificateUploadProps) {
                                 </button>
                                 <div className="flex items-center justify-center w-full">
                                     <div className='flex flex-col w-full border-4 border-blue-200 border-dashed hover:bg-gray-100 hover:border-gray-300'>
-                                        <img className='object-contain max-h-40' src={previewImage} />
+                                        <img className='object-contain max-h-40'
+                                            alt="certificate preview"
+                                            src={previewImage} />
                                     </div>
                                 </div>
                             </>
